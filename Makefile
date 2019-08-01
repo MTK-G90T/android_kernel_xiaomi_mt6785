@@ -701,6 +701,10 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, attribute-alias)
 
+ifdef CONFIG_CC_WERROR
+KBUILD_CFLAGS  += -Werror
+endif
+
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 else
@@ -708,19 +712,8 @@ KBUILD_CFLAGS   += -O3
 ifeq ($(cc-name),gcc)
 KBUILD_CFLAGS	+= -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
 endif
-
-ifdef CONFIG_CC_WERROR
-KBUILD_CFLAGS  += -Werror
-
-endif
-
 ifeq ($(cc-name),clang)
-KBUILD_CFLAGS   += -mcpu=cortex-a55 -mtune=cortex-a55
-endif
-
-ifeq ($(cc-name),gcc)
-KBUILD_CFLAGS   += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
-endif
+KBUILD_CFLAGS	+= -mcpu=cortex-a55 -mtune=cortex-a55
 
 ifdef CONFIG_LLVM_POLLY
 KBUILD_CFLAGS	+= -mllvm -polly \
@@ -730,6 +723,8 @@ KBUILD_CFLAGS	+= -mllvm -polly \
 		   -mllvm -polly-detect-keep-going \
 		   -mllvm -polly-vectorizer=stripmine \
 		   -mllvm -polly-invariant-load-hoisting
+endif
+endif
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
