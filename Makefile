@@ -363,8 +363,13 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
 HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
 HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
 
-HOSTCC       =  ccache gcc
-HOSTCXX      =  ccache g++
+ifneq ($(LLVM),)
+HOSTCC	= clang
+HOSTCXX	= clang++
+else
+HOSTCC	= gcc
+HOSTCXX	= g++
+endif
 HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
 HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
@@ -372,18 +377,29 @@ HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
 HOST_LOADLIBES := $(HOST_LFS_LIBS)
 
 # Make variables (CC, etc...)
-LD				=  ccache $(CROSS_COMPILE)ld
-LDGOLD			=  ccache $(CROSS_COMPILE)ld.gold
-CC				=  ccache $(CROSS_COMPILE)gcc
-CPP				=  ccache $(CC) -E
-AR				=  ccache $(CROSS_COMPILE)ar
-NM				=  ccache $(CROSS_COMPILE)nm
-STRIP			=  ccache $(CROSS_COMPILE)strip
-OBJCOPY			=  ccache $(CROSS_COMPILE)objcopy
-OBJDUMP			=  ccache $(CROSS_COMPILE)objdump
-READELF			=  ccache $(CROSS_COMPILE)readelf
-AWK				=	awk
-GENKSYMS		= scripts/genksyms/genksyms
+CPP		= $(CC) -E
+ifneq ($(LLVM),)
+CC		= clang
+LD		= ld.lld
+AR		= llvm-ar
+NM		= llvm-nm
+OBJCOPY		= llvm-objcopy
+OBJDUMP		= llvm-objdump
+READELF		= llvm-readelf
+STRIP		= llvm-strip
+else
+CC		= $(CROSS_COMPILE)gcc
+LD		= $(CROSS_COMPILE)ld
+LDGOLD		= $(CROSS_COMPILE)ld.gold
+AR		= $(CROSS_COMPILE)ar
+NM		= $(CROSS_COMPILE)nm
+OBJCOPY		= $(CROSS_COMPILE)objcopy
+OBJDUMP		= $(CROSS_COMPILE)objdump
+READELF		= $(CROSS_COMPILE)readelf
+STRIP           = $(CROSS_COMPILE)strip
+endif
+AWK		= awk
+GENKSYMS	= scripts/genksyms/genksyms
 INSTALLKERNEL  := installkernel
 DEPMOD			= depmod
 PERL			= perl
