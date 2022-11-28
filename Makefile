@@ -418,9 +418,6 @@ CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 LDFLAGS_vmlinux =
 
-HOSTLDFLAGS += -fuse-ld=lld
-HOSTCFLAGS += -fuse-ld=lld
-
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE    := \
 		-I$(srctree)/arch/$(hdr-arch)/include/uapi \
